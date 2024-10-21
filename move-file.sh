@@ -9,6 +9,7 @@
 SOURCEFILE=$1
 DEST=$2
 OVERWRITE=$3
+VM=$4
 VM2='10.0.1.6'
 USRNAME='manu'
 # Convert the comma-separated source files into an array
@@ -23,7 +24,9 @@ for name in "${name_array[@]}"; do
         echo "File /tmp/$name does not exist, skipping."
         continue
     fi
-    sudo scp /tmp/$name $USRNAME@$VM2:/tmp
+    if [ $VM -eq 1 ]; then
+        sudo scp /tmp/$name $USRNAME@$VM2:/tmp
+    fi
     # Set permissions and ownership
     sudo chmod 755 "/tmp/$name"
     sudo chown root:root "/tmp/$name"
@@ -37,28 +40,5 @@ for name in "${name_array[@]}"; do
         sudo mv -n "/tmp/$name" "$DEST"
     fi
 done
-echo "in VM2"
-ssh $USRNAME@$VM2 << EOF
-for name in "\${name_array[@]}"; do
-    echo "Processing file: $name"
-    
-    # Ensure the file exists before proceeding
-    if [ ! -f "/tmp/\$name" ]; then
-        echo "File /tmp/\$name does not exist, skipping."
-        continue
-    fi
-    # Set permissions and ownership
-    sudo chmod 755 "/tmp/\$name"
-    sudo chown root:root "/tmp/\$name"
 
-    # Move file based on overwrite condition
-    if [ "$OVERWRITE" = "yes" ]; then
-        echo "Overwriting: $name"
-        sudo mv -f "/tmp/\$name" "$DEST"
-    else
-        echo "Not overwriting: $name"
-        sudo mv -n "/tmp/\$name" "$DEST"
-    fi
-done
-EOF
 echo "Script completed."
