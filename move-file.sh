@@ -38,26 +38,26 @@ for name in "${name_array[@]}"; do
     fi
 done
 echo "in VM2"
-ssh $USRNAME@$VM2 >> EOF
-for name in "${name_array[@]}"; do
+ssh $USRNAME@$VM2 << EOF
+for name in "\${name_array[@]}"; do
     echo "Processing file: $name"
     
     # Ensure the file exists before proceeding
-    if [ ! -f "/tmp/$name" ]; then
-        echo "File /tmp/$name does not exist, skipping."
+    if [ ! -f "/tmp/\$name" ]; then
+        echo "File /tmp/\$name does not exist, skipping."
         continue
     fi
     # Set permissions and ownership
-    sudo chmod 755 "/tmp/$name"
-    sudo chown root:root "/tmp/$name"
+    sudo chmod 755 "/tmp/\$name"
+    sudo chown root:root "/tmp/\$name"
 
     # Move file based on overwrite condition
     if [ "$OVERWRITE" = "yes" ]; then
         echo "Overwriting: $name"
-        sudo mv -f "/tmp/$name" "$DEST"
+        sudo mv -f "/tmp/\$name" "$DEST"
     else
         echo "Not overwriting: $name"
-        sudo mv -n "/tmp/$name" "$DEST"
+        sudo mv -n "/tmp/\$name" "$DEST"
     fi
 done
 EOF
