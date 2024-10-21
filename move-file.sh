@@ -24,8 +24,8 @@ for name in "${name_array[@]}"; do
         echo "File /tmp/$name does not exist, skipping."
         continue
     fi
-    if [ $VM -eq 1 ]; then
-        sudo scp /tmp/$name $USRNAME@$VM2:/tmp
+    if [ "$VM" == "1" ]; then
+        sudo scp /tmp/$name "$USRNAME@$VM2:/tmp"
     fi
     # Set permissions and ownership
     sudo chmod 755 "/tmp/$name"
