@@ -14,13 +14,19 @@ pipeline {
     }
 
     stages {
+       stage('check-out') {
+            steps {
+                echo 'cloning git repo'
+                git branch: 'main', url: 'https://github.com/manu41608/repo-task.git'
+            }
+        }
         stage('Transfer Files') {
             steps {
                 script {
                     // Copy the script to the remote server if necessary
                     // You can also keep the script in a shared location if needed
                     sh """
-                    scp move_file.sh ${USERNAME}@${REPO_VM1}:/tmp/move_file.sh
+                    scp move-file.sh ${USERNAME}@${REPO_VM1}:/tmp/move_file.sh
                     ssh ${USERNAME}@${REPO_VM1} "sudo chmod +x /tmp/move_file.sh"
                     ssh ${USERNAME}@${REPO_VM1} "sudo /tmp/move_files.sh '${params.sourcefile}' '${params.dest}' '${params.overwrite}'"
                     """
