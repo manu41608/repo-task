@@ -28,7 +28,10 @@ pipeline {
                     sh """
                     scp move-file.sh ${USERNAME}@${REPO_VM1}:/tmp/move-file.sh
                     ssh ${USERNAME}@${REPO_VM1} "sudo chmod +x /tmp/move-file.sh"
-                    ssh ${USERNAME}@${REPO_VM1} "sudo bash /tmp/move-file.sh '${params.sourcefile}' '${params.dest}' '${params.overwrite}' 1"
+                                        
+                    ssh ${USERNAME}@${REPO_VM1} << EOF 
+                      "sudo bash /tmp/move-file.sh '${params.sourcefile}' '${params.dest}' '${params.overwrite}' 1"
+                     EOF
                     """
                 }
             }
