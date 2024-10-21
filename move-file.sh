@@ -10,7 +10,7 @@ SOURCEFILE=$1
 DEST=$2
 OVERWRITE=$3
 VM=$4
-VM2='10.0.1.6'
+VM2='10.1.0.6'
 USRNAME='manu'
 # Convert the comma-separated source files into an array
 IFS=',' read -r -a name_array <<< "$SOURCEFILE"
