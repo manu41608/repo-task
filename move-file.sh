@@ -60,4 +60,5 @@ for name in "${name_array[@]}"; do
         sudo mv -n "/tmp/$name" "$DEST"
     fi
 done
+EOF
 echo "Script completed."
