@@ -14,12 +14,7 @@ pipeline {
     }
 
     stages {
-       stage('check-out') {
-            steps {
-                echo 'cloning git repo'
-                git branch: 'main', url: 'https://github.com/manu41608/repo-task.git'
-            }
-        }
+       
         stage('Transfer Files to vm1') {
             steps {
                 script {
