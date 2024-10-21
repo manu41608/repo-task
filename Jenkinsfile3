@@ -26,7 +26,7 @@ pipeline {
                     // Copy the script to the remote server if necessary
                     // You can also keep the script in a shared location if needed
                     sh """
-                    scp move-file.sh ${USERNAME}@${REPO_VM1}:/tmp/move_file.sh
+                    scp move-file.sh ${USERNAME}@${REPO_VM1}:/tmp/move-file.sh
                     ssh ${USERNAME}@${REPO_VM1} "sudo chmod +x /tmp/move-file.sh"
                     ssh ${USERNAME}@${REPO_VM1} "sudo /tmp/move-files.sh '${params.sourcefile}' '${params.dest}' '${params.overwrite}'"
                     """
