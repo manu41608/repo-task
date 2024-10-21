@@ -1,0 +1,71 @@
+pipeline {
+   
+   agent any
+
+   envirnoment {
+    REPO-VM1 = 'IP'
+    REPO-VM2 = 'IP'
+    USERNAME = 'manu'
+
+   }
+   parameters {
+
+    string(name: 'sourcefile',description: 'sorce')
+    choice(name: 'dest', choices: ['/var/lib','/var']), description: 'dest')
+    choice(name: 'overwrite', choices: ['yes','no'])
+   }
+
+   stages {
+    
+      stage('repo-share') {
+          steps {
+
+              script{
+                  
+                  sh """
+                   ssh ${params.USERNAME}@${params.REPO-VM1} << EOF
+
+                   IFS=',' read -r -a name_arrray <<< "${params.sourcefile}"
+
+                   for name in "${name_arrray[@]}"; do
+                      sudo scp /tmp/$name ${params.USERNAME}@${params.REPO-VM2}:/tmp
+                      sudo chmod 755 /tmp/$name
+                      sudo chown root:root /tmp/$name
+                      if [ "${params.overwrite}" = "yes" ]; then
+                           sodo mv -f /tmp/$name "${params.dest}" 
+                      else
+                            sodo mv -n /tmp/$name "${params.dest}"
+                      fi
+
+                      
+                   done
+                   EOF
+
+                    ssh ${params.USERNAME}@${params.REPO-VM2} << EOF
+
+                   IFS=',' read -r -a name_arrray <<< "${params.sourcefile}"
+
+                   for name in "${name_arrray[@]}"; do
+                      sudo chmod 755 /tmp/$name
+                      sudo chown root:root /tmp/$name
+                       if [ "${params.overwrite}" = "yes" ]; then
+                           sodo mv -f /tmp/$name "${params.dest}" 
+                      else
+                            sodo mv -n /tmp/$name "${params.dest}"
+                      fi
+                   done
+                   EOF
+                  """
+
+              }
+
+
+          }
+          
+
+      }
+ 
+
+   }
+
+}

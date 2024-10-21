@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+
+    environment {
+        REPO_VM1 = 'IP'  // Use underscores instead of hyphens for environment variable names
+        REPO_VM2 = 'IP'
+        USERNAME = 'manu'
+    }
+
+    parameters {
+        string(name: 'sourcefile', description: 'Source file(s), comma-separated')
+        choice(name: 'dest', choices: ['/var/lib', '/var'], description: 'Destination directory')
+        choice(name: 'overwrite', choices: ['yes', 'no'], description: 'Overwrite existing files?')
+    }
+
+    stages {
+        stage('repo-share') {
+            steps {
+                script {
+                    sh """
+                    ssh ${USERNAME}@${REPO_VM1} << EOF
+                    IFS=',' read -r -a name_array <<< "${params.sourcefile}"
+
+                    for name in "\${name_array[@]}"; do
+                        sudo scp /tmp/\$name ${USERNAME}@${REPO_VM2}:/tmp
+                        sudo chmod 755 /tmp/\$name
+                        sudo chown root:root /tmp/\$name
+                        if [ "${params.overwrite}" = "yes" ]; then
+                            sudo mv -f /tmp/\$name "${params.dest}"  // Corrected "sodo" to "sudo"
+                        else
+                            sudo mv -n /tmp/\$name "${params.dest}"
+                        fi
+                    done
+                    EOF
+
+                    ssh ${USERNAME}@${REPO_VM2} << EOF
+                    IFS=',' read -r -a name_array <<< "${params.sourcefile}"
+
+                    for name in "\${name_array[@]}"; do
+                        sudo chmod 755 /tmp/\$name
+                        sudo chown root:root /tmp/\$name
+                        if [ "${params.overwrite}" = "yes" ]; then
+                            sudo mv -f /tmp/\$name "${params.dest}" // Corrected "sodo" to "sudo"
+                        else
+                            sudo mv -n /tmp/\$name "${params.dest}"
+                        fi
+                    done
+                    EOF
+                    """
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+
+    environment {
+        REPO_VM1 = '10.1.0.5'
+        REPO_VM2 = '10.1.0.6'
+        USERNAME = 'manu'
+    }
+
+    parameters {
+        string(name: 'sourcefile', description: 'Source file(s), comma-separated')
+        choice(name: 'dest', choices: ['/var/lib', '/var'], description: 'Destination directory')
+        choice(name: 'overwrite', choices: ['yes', 'no'], description: 'Overwrite existing files?')
+    }
+
+    stages {
+        stage('Transfer Files') {
+            steps {
+                script {
+                    // Copy the script to the remote server if necessary
+                    // You can also keep the script in a shared location if needed
+                    sh """
+                    scp move_file.sh ${USERNAME}@${REPO_VM1}:/tmp/move_file.sh
+                    ssh ${USERNAME}@${REPO_VM1} "sudo chmod +x /tmp/move_file.sh"
+                    ssh ${USERNAME}@${REPO_VM1} "sudo /tmp/move_files.sh '${params.sourcefile}' '${params.dest}' '${params.overwrite}'"
+                    """
+                }
+            }
+        }
+    }
+}
